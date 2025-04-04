@@ -1,9 +1,9 @@
-# 𝕏-Teaming: Multi-Turn Jailbreaks and Defenses with Adaptive Multi-Agents (2025)
+# 𝕏-Teaming: Multi-Turn Jailbreaks and Defenses with Adaptive Multi-Agents
 by *Salman Rahman\*, Liwei Jiang\*, James Shiffer\*, Genglin Liu, Sheriff Issaka, Md Rizwan Parvez, Hamid Palangi, Kai-Wei Chang, Yejin Choi, Saadia Gabriel*
 
 <small>*\*equal contribution*</small>
 
-<div style="text-align: center">
+<div align="center">
     <a href="https://arxiv.org/abs/2410.10700"> <img alt="paper link" src="https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg"></a>
     <a href="https://huggingface.co/datasets/TODO"> <img alt="dataset link" src="https://img.shields.io/badge/HuggingFace-XGuard--Train-yellow.svg"></a>
     <a href="https://x-teaming.github.io"> <img alt="dataset link" src="https://img.shields.io/badge/Website-X--Teaming-blue.svg"></a>
@@ -117,7 +117,7 @@ Run the following script to generate heatmaps of pairwise embedding dissimilarit
 python analytics/strategy_diversity.py strategies/[timestamp]/attack_plans.json
 ```
 
-<div style="text-align: center">
+<div align="center">
   <img alt="Heatmap of strategy diversity" src="strategy-diversity.png" height="400">
 </div>
 </details>
