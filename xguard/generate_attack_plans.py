@@ -126,14 +126,6 @@ def main():
         description="Tweaked version of attack plan generation script for XGuard-Train seed data"
     )
     args.add_argument("-c", "--config", action="store", default="./config.yaml")
-    args.add_argument(
-        "-i",
-        "--input",
-        action="store",
-        default="../behaviors/sampled_data_2500.csv",
-        help="Path to CSV file of behaviors in WildJailbreak format (`Behavior`, `id` columns)",
-    )
-
     parsed_args = args.parse_args()
 
     # Load configuration
@@ -147,8 +139,10 @@ def main():
     )
     setup_logging(output_dir)
     agent = BaseAgent(config["attack_plan_generator"])
-    logging.info(f"Generating attack plans from csv file: {parsed_args.input}")
-    df = pd.read_csv(parsed_args.input)
+    logging.info(
+        f"Generating attack plans from csv file: {config['attack_plan_generator']['behavior_path']}"
+    )
+    df = pd.read_csv(config["attack_plan_generator"]["behavior_path"])
 
     all_behaviors_data = []
     all_messages = []

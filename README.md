@@ -267,9 +267,18 @@ Configuration file is located at `xguard/config.yaml`.
 
 We sampled 5,000 harmful behaviors from WildJailbreak’s vanilla harmful collection and put them in a CSV (not included). The CSV is expected to have the following columns: `Behavior`, `id`.
 
+Point the config to the path for the CSV:
+
+```yaml
+# xguard/config.yaml
+attack_plan_generator:
+  # ...
+  behavior_path: "../behaviors/wildjailbreak.csv"
+```
+
 ```bash
 cd xguard
-python generate_attack_plans.py -i ../behaviors/wildjailbreak.csv
+python generate_attack_plans.py
 ```
 
 This uses a special config file `xguard/config.yaml` which generates five strategies per behavior in only one set.
