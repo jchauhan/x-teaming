@@ -377,20 +377,13 @@ class TGAttackerAgent(AttackerAgent):
             )
         )
 
-        def eval_and_ensure_no_refusal(eval_func, target_response):
-            """
-            It is entirely possible that the loss query ends up being refused by the
-            TGD engine, so raise an exception if it is.
-            """
-            loss = eval_func(target_response)
-            if "can't assist with that" in loss.value:
-                raise LLMRefusalError(loss.value)
-            return loss
-
         try:
             for attempt in Retrying(stop=stop_after_attempt(5), wait=wait_fixed(1)):
                 with attempt:
-                    loss = eval_and_ensure_no_refusal(eval_fn, target_response)
+                    # It is entirely possible that the loss query ends up being refused by the TGD engine, so raise an exception if it is.
+                    loss = eval_fn(target_response)
+                    if "can't assist with that" in loss.value:
+                        raise LLMRefusalError(loss.value)
         except RetryError as e:
             logging.error(
                 "TextGrad loss computation failed after 5 attempts",
