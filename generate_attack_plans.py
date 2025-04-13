@@ -77,7 +77,7 @@ def create_output_directory(base_output_dir):
 
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
-def generate_strategies(agent, behavior, messages, set_num, temperature):
+def generate_strategies(agent, messages, set_num, temperature):
     """Generate strategies for a single set"""
     response = agent.call_api(
         messages=messages,
@@ -87,6 +87,7 @@ def generate_strategies(agent, behavior, messages, set_num, temperature):
 
     # Parse the response string into a Python dictionary
     parsed_response = json.loads(response)
+    assert len(parsed_response) == 10
 
     logging.info(f"\nSet {set_num} Generated Strategies:")
     logging.info(response)  # Keep original logging
@@ -94,7 +95,7 @@ def generate_strategies(agent, behavior, messages, set_num, temperature):
     return parsed_response  # Return parsed dictionary instead of raw string
 
 
-def process_single_behavior(i, row, agent, temperature):
+def process_single_behavior(i, row, agent, temperature, num_sets=5):
     behavior = row["Behavior"]
     behavior_id = row["BehaviorID"]
     logging.info(f"\n{'='*50}")
@@ -116,7 +117,7 @@ def process_single_behavior(i, row, agent, temperature):
     }
 
     # Generate strategies for each set
-    for set_num in range(1, 6):
+    for set_num in range(1, num_sets + 1):
         logging.info(f"\nGenerating Set {set_num}:")
 
         system_prompt, formatted_user_prompt = load_and_format_prompts(
@@ -141,7 +142,6 @@ def process_single_behavior(i, row, agent, temperature):
 
         response = generate_strategies(
             agent=agent,
-            behavior=behavior,
             messages=messages,
             set_num=set_num,
             temperature=temperature,

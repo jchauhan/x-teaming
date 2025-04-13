@@ -57,7 +57,7 @@ def create_output_directory(base_output_dir):
 
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(1))
-def generate_strategies(agent, behavior, messages, temperature):
+def generate_strategies(agent, messages, temperature):
     """Generate strategies for a single set"""
     response = agent.call_api(
         messages=messages,
@@ -67,6 +67,7 @@ def generate_strategies(agent, behavior, messages, temperature):
 
     # Parse the response string into a Python dictionary
     parsed_response = json.loads(response)
+    assert len(parsed_response) == 5
 
     logging.info(response)  # Keep original logging
 
@@ -111,7 +112,6 @@ def process_single_behavior(i, row, agent, temperature):
 
     response = generate_strategies(
         agent=agent,
-        behavior=behavior,
         messages=messages,
         temperature=temperature,
     )
