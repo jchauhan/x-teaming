@@ -1,3 +1,4 @@
+import argparse
 import concurrent.futures
 import json
 import logging
@@ -9,6 +10,7 @@ import tiktoken
 import tqdm
 import yaml
 
+sys.path.append("../")
 from agents.base_agent import BaseAgent
 from agents.gpt_evaluator import GPTJudge
 
@@ -30,7 +32,7 @@ def create_output_directory():
     """Create timestamped output directory for results"""
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     # Use a relative path or path in user's home directory
-    base_output_dir = "./xguard/output"
+    base_output_dir = "./output"
     output_dir = os.path.join(base_output_dir, timestamp)
     os.makedirs(output_dir, exist_ok=True)
     return output_dir
@@ -103,20 +105,51 @@ def process_single_convo(behavior, behavior_number, convo, agent, judge, safety_
 
 
 def main():
+    args = argparse.ArgumentParser(
+        description="Generates safety training data by rewriting the final target response of conversations above a certain score."
+    )
+    args.add_argument(
+        "timestamp", action="store", type=str, help="Timestamp of experiment"
+    )
+    args.add_argument(
+        "-c",
+        "--config",
+        action="store",
+        type=str,
+        default="./config.yaml",
+        help="Path to YAML config file",
+    )
+    args.add_argument(
+        "-p",
+        "--prompt",
+        action="store",
+        type=str,
+        default="./safe_response_prompt.yaml",
+        help="Path to YAML containing safe data generation prompt",
+    )
+    args.add_argument(
+        "-t",
+        "--threshold_score",
+        action="store",
+        type=int,
+        default=1,
+        help="Maximum score that does not need clean response",
+    )
+    parsed_args = args.parse_args()
+
     # Load configuration
-    with open("./xguard/config.yaml", "r") as f:
+    with open(parsed_args.config, "r") as f:
         config = yaml.safe_load(f)
 
-    in_dir = sys.argv[1]
-    with open(f"./attacks/{in_dir}/all_results.json") as f:
+    with open(f"../attacks/{parsed_args.timestamp}/all_results.json") as f:
         in_json = json.load(f)
 
     # Setup
     output_dir = create_output_directory()
     setup_logging(output_dir)
-    agent = BaseAgent(config["attack_plan_generator"])
+    agent = BaseAgent(config["safety_data_generator"])
 
-    with open("./xguard/safe_response_prompt.yaml", "r") as f:
+    with open(parsed_args.prompt, "r") as f:
         safety_yaml = yaml.safe_load(f)
         safety_cfg = {
             "sysprompt": safety_yaml["prompts"]["system"]["messages"][0]["content"],
@@ -129,7 +162,7 @@ def main():
     all_params = []
     for b in in_json["behaviors"].values():
         for s in b["strategies"]:
-            if s["conversation"][-1]["evaluation_score"] == 1:
+            if s["conversation"][-1]["evaluation_score"] <= parsed_args.threshold_score:
                 continue
             all_params.append(
                 {
