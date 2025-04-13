@@ -16,6 +16,10 @@ by *Salman Rahman\*, Liwei Jiang\*, James Shiffer\*, Genglin Liu, Sheriff Issaka
 
 **𝕏-Teaming** is a scalable framework that systematically explores how seemingly harmless interactions with LLMs escalate into harmful outcomes. It employs collaborative agents for planning, attack optimization, and verification, achieving state-of-the-art multi-turn jailbreak effectiveness and diversity with **success rates up to 99.4%** across representative leading open-weight and closed-source models. In particular, **𝕏-Teaming** achieves a **96.2% attack success rate** against the latest Claude 3.7 Sonnet model, which has been considered nearly immune to single-turn attacks.
 
+## Quickstart
+
+To test our jailbreaking method with your own prompts, use the provided `demo.ipynb` notebook. You will need at least an OpenAI API key to run the Validator.
+
 ## Setup
 
 1. Install requirements:
