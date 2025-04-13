@@ -75,7 +75,6 @@ def run_single_strategy(
     attacker_config,
     target_config,
     tg_config,
-    output_dir,
     eval_config,
 ):
     behavior = plan["behavior_details"]
@@ -193,9 +192,7 @@ Evaluation Reason: {turn_data['evaluation_reason']}
     return strategy_result
 
 
-def run_single_behavior(
-    plan, attacker_config, target_config, tg_config, output_dir, eval_config
-):
+def run_single_behavior(plan, attacker_config, target_config, tg_config, eval_config):
     behavior = plan["behavior_details"]
     behavior_number = plan["behavior_number"]
     target_behavior = behavior["Behavior"]
@@ -229,7 +226,6 @@ def run_single_behavior(
                 "attacker_config": attacker_config,
                 "target_config": target_config,
                 "tg_config": tg_config,
-                "output_dir": output_dir,
                 "eval_config": eval_config,
             }
             param_dicts.append(param_dict)
@@ -290,7 +286,6 @@ def main(debug, config_path):
                 "target_config": target_config,
                 "eval_config": eval_config,
                 "tg_config": tg_config,
-                "output_dir": output_dir,
             }
         )
 
