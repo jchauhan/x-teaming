@@ -1,9 +1,11 @@
 import argparse
+import concurrent.futures
 import json
 
 import numpy as np
 import scipy.stats as stats
 import tiktoken
+import tqdm
 
 
 def main():
@@ -55,18 +57,19 @@ def main():
                     )
 
         print("\n===== Metrics for experiment", parsed_args.timestamp, "=====")
-        num_strategies = 0
-        successful_strategies = set()
-        all_sets = set()
-        successful_sets = set()
-        num_behaviors = len(all_results["behaviors"])
-        successful_behaviors = set()
-
-        # histograms
-        turns_taken_histo = {i: 0 for i in range(1, 11)}
-        plans_taken_histo = {i: 0 for i in range(1, 51)}
-        textgrad_histo = {i: 0 for i in range(0, 10)}
-        num_tokens = []
+        metrics = dict(
+            num_strategies=0,
+            successful_strategies=set(),
+            all_sets=set(),
+            successful_sets=set(),
+            num_behaviors=len(all_results["behaviors"]),
+            successful_behaviors=set(),
+            # histograms
+            turns_taken_histo={i: 0 for i in range(1, 11)},
+            plans_taken_histo={i: 0 for i in range(1, 51)},
+            textgrad_histo={i: 0 for i in range(0, 10)},
+            num_tokens=[],
+        )
 
         def count_tokens(response_text):
             encoding = tiktoken.encoding_for_model("gpt-4o-2024-08-06")
@@ -88,9 +91,8 @@ def main():
 
         semantic_categories = {}
 
-        for b in all_results["behaviors"].values():
-
-            num_strategies += len(b["strategies"])
+        def analyze_single_behavior(b):
+            metrics["num_strategies"] += len(b["strategies"])
 
             category = b["behavior"].get("SemanticCategory", "unknown")
             if category not in semantic_categories:
@@ -102,49 +104,63 @@ def main():
 
                 # there are multiple strategies within a set, and multiple sets per behavior
                 set_id = f'b{b["behavior_number"]}_s{s["set_number"]}'
-                all_sets.add(set_id)
+                metrics["all_sets"].add(set_id)
 
                 if s["jailbreak_achieved"]:
                     # count number of tokens per plan
                     full_convo = format_full_conversation(s["conversation"])
-                    num_tokens.append(count_tokens(full_convo))
+                    metrics["num_tokens"].append(count_tokens(full_convo))
                     # count number of turns taken per plan
                     strategy_id = f'{set_id}-{s["strategy_number"]}'
-                    successful_behaviors.add(b["behavior_number"])
-                    turns_taken_histo[len(s["conversation"])] += 1
+                    metrics["successful_behaviors"].add(b["behavior_number"])
+                    metrics["turns_taken_histo"][len(s["conversation"])] += 1
                     num_textgrad_turns = sum(
                         [
                             turn.get("loss", None) is not None
                             for turn in s["conversation"]
                         ]
                     )
-                    textgrad_histo[num_textgrad_turns] += 1
+                    metrics["textgrad_histo"][num_textgrad_turns] += 1
                     semantic_categories[category]["successful"].add(
                         b["behavior_number"]
                     )
-                    successful_sets.add(set_id)
-                    successful_strategies.add(strategy_id)
+                    metrics["successful_sets"].add(set_id)
+                    metrics["successful_strategies"].add(strategy_id)
 
             # count number of plans taken per behavior
-            if b["behavior_number"] in successful_behaviors:
-                plans_taken_histo[len(b["strategies"])] += 1
+            if b["behavior_number"] in metrics["successful_behaviors"]:
+                metrics["plans_taken_histo"][len(b["strategies"])] += 1
+
+        all_behaviors = all_results["behaviors"].values()
+
+        # analyze behaviors in parallel, because long runs may have thousands of them
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            futures = {
+                executor.submit(analyze_single_behavior, b=behavior): behavior
+                for behavior in all_behaviors
+            }
+            iterator = concurrent.futures.as_completed(futures)
+            if len(futures) >= 1000:
+                iterator = tqdm.tqdm(iterator, total=len(futures))
+            for future in iterator:
+                pass
 
         print("Behavior ASR:")
         if parsed_args.verbose:
             print(
-                f"Set ASR     \t{len(successful_sets)}/{len(all_sets)}\t{100.0 * len(successful_sets) / len(all_sets):.1f}%"
+                f"Set ASR     \t{len(metrics['successful_sets'])}/{len(metrics['all_sets'])}\t{100.0 * len(metrics['successful_sets']) / len(metrics['all_sets']):.1f}%"
             )
             print(
-                f"Strategy ASR\t{len(successful_strategies)}/{num_strategies}\t{100.0 * len(successful_strategies) / num_strategies:.1f}%"
+                f"Strategy ASR\t{len(metrics['successful_strategies'])}/{metrics['num_strategies']}\t{100.0 * len(metrics['successful_strategies']) / metrics['num_strategies']:.1f}%"
             )
             print("Category")
             for label in sorted(semantic_categories.keys()):
                 collection = semantic_categories[label]
                 print(
-                    f'    {label:<30}\t{len(collection["successful"])}/{len(collection["total"])}\t{100.0 * len(collection["successful"]) / len(collection["total"]):.1f}%'
+                    f"    {label:<30}\t{len(collection['successful'])}/{len(collection['total'])}\t{100.0 * len(collection['successful']) / len(collection['total']):.1f}%"
                 )
         print(
-            f"Total\t\t\t\t\t{len(successful_behaviors)}/{num_behaviors}\t{100.0 * len(successful_behaviors) / num_behaviors:.1f}%"
+            f"Total\t\t\t\t\t{len(metrics['successful_behaviors'])}/{metrics['num_behaviors']}\t{100.0 * len(metrics['successful_behaviors']) / metrics['num_behaviors']:.1f}%"
         )
 
         def margin_of_error(x):
@@ -169,17 +185,17 @@ def main():
             print(f"Average\t\t\t\t\t{avg:.3f} ± {error:.3f}")
 
         print("Number of Turns Taken:")
-        process_histogram_dict(turns_taken_histo)
+        process_histogram_dict(metrics["turns_taken_histo"])
 
         print("Number of Plans Used:")
-        process_histogram_dict(plans_taken_histo)
+        process_histogram_dict(metrics["plans_taken_histo"])
 
         print("Number of TextGrad Used:")
-        process_histogram_dict(textgrad_histo)
+        process_histogram_dict(metrics["textgrad_histo"])
 
         print("Number of Tokens Used:")
         print(
-            f"Average\t\t\t\t\t{np.average(num_tokens):.3f} ± {margin_of_error(num_tokens):.3f}"
+            f"Average\t\t\t\t\t{np.average(metrics['num_tokens']):.3f} ± {margin_of_error(metrics['num_tokens']):.3f}"
         )
 
 
