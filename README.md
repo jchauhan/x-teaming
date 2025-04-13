@@ -253,7 +253,7 @@ Most of our scripts process different behaviors in parallel, which speeds up the
 
 # 𝕏Guard-Train: A Large-Scale Dataset for Multi-Turn LM Safety
 
-[![Dataset on HF](https://huggingface.co/datasets/huggingface/badges/resolve/main/dataset-on-hf-md.svg)](https://huggingface.co/datasets)
+[![Dataset on HF](https://huggingface.co/datasets/huggingface/badges/resolve/main/dataset-on-hf-md.svg)](https://huggingface.co/datasets/marslabucla/XGuard-Train)
 
 A comprehensive multi-turn safety dataset for improving conversational AI defenses against sophisticated jailbreaking attacks.
 
@@ -265,7 +265,7 @@ Configuration file is located at `xguard/config.yaml`.
 
 ### 1. Generate Attack Plans
 
-We sampled 5,000 harmful behaviors from WildJailbreak’s vanilla harmful collection and put them in a CSV (not included). The CSV is expected to have the following columns: `Behavior`, `id`.
+We sampled ~30,000 harmful behaviors from WildJailbreak’s vanilla harmful collection and put them in a CSV (not included). The CSV is expected to have the following columns: `Behavior`, `id`.
 
 Point the config to the path for the CSV:
 
@@ -318,25 +318,30 @@ attacker:
   strategies_per_set: 2          # change this if changing strategies_per_behavior
 ```
 
+Make note of the path in which the run is saved, i.e. `attacks/[timestamp]/all_results.json`.
+
 ### 3. Generate clean responses
 
 For those attack plans which did not already score a 1/5, we need to modify the conversation to end with a relevant refusal message for the purposes of 𝕏Guard-Train.
 
 ```bash
-python generate_safe_responses.py
+cd xguard
+python generate_safe_responses.py [timestamp]
 ```
+
+You can use the `-t` flag to increase the score cutoff from 1/5.
 
 GPT-4o is used by default to generate these refusals. Change these settings if you wish to use a different model:
 
 ```yaml
 # xguard/config.yaml
-attack_plan_generator:
+safety_data_generator:
   provider: "openai"
   model: "gpt-4o"
-  temperature: 0.5
+  temperature: 0
 ```
 
-The resulting conversations will be found in `output/[timestamp]/safe_convos_scores.json`.
+The resulting conversations will be found in `xguard/output/[timestamp]/safe_convos_scores.json` (different timestamp from the source data).
 
 ### 4. Reformat JSON for SFT
 
@@ -355,12 +360,16 @@ This script can be run on an attack conversations file (`all_results.json`) or c
 ]
 ```
 
-```bash
-cd xguard
-python reformat_convos.py ./output/[timestamp]/safe_convos_scores.json output.json
-```
+Conversations which are found to have a final message with a score greater than 1 are not included in the output. (Likewise, this cutoff can be changed with `-t`.) Therefore, we compile our training data like so:
 
-Conversations which are found to have a final message with a score greater than 1 are not included in the output.
+```bash
+# export the already safe conversations from all_results into ShareGPT format
+python reformat_convos.py ../attacks[timestamp1]/all_results.json ./output/train-1.json
+# export the rewritten safe conversations from safe_convos_scores into ShareGPT format
+python reformat_convos.py ./output/[timestamp2]/safe_convos_scores.json ./output/train-2.json
+# merge the two (requires `jq`)
+jq -s 'add' train-1.json train-2.json > train.json
+```
 
 ## Ethics Statement
 

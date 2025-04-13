@@ -46,6 +46,12 @@ attack_plan_generator:
   attack_plan_generation_dir: "./output"
   num_behaviors: 2500
 
+safety_data_generator:
+  provider: "openai"
+  model: "gpt-4o"
+  temperature: 0
+  max_retries: 10
+
 evaluation:
   use_gpt_judge: true  # Set to true to use GPT evaluator
   judge_model: "gpt-4o"  # Only needed if use_gpt_judge is true

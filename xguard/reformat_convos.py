@@ -1,6 +1,5 @@
 import argparse
 import json
-import logging
 
 
 def reformat_convo(convo):
@@ -35,7 +34,7 @@ def main():
 
     cfg = args.parse_args()
 
-    logging.info(f"Reading input JSON: {cfg.in_path}")
+    print(f"Reading input JSON: {cfg.in_path}")
 
     with open(cfg.in_path, "r") as in_file:
         in_json = json.load(in_file)
@@ -57,14 +56,14 @@ def main():
                         {"conversations": reformat_convo(s["conversation"])}
                     )
 
-    logging.info(
+    print(
         f"Writing {len(out_plans)} strategies with score <= {cfg.threshold_score} to {cfg.out_path}"
     )
 
     with open(cfg.out_path, "w") as out_file:
         json.dump(out_plans, out_file, indent=4, ensure_ascii=False)
 
-    logging.info("Finished")
+    print("Finished")
 
 
 if __name__ == "__main__":
