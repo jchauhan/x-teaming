@@ -18,7 +18,7 @@ by *Salman Rahman\*, Liwei Jiang\*, James Shiffer\*, Genglin Liu, Sheriff Issaka
 
 ## Quickstart
 
-To test our jailbreaking method with your own prompts, use the provided `demo.ipynb` notebook. You will need at least an OpenAI API key to run the Validator.
+To test our jailbreaking method with your own prompts, use the provided `demo.ipynb` notebook. You will need at least an OpenAI API key to run the Verifier.
 
 ## Setup
 
@@ -57,7 +57,7 @@ export OPENAI_API_KEY="your-key"
 export OPENROUTER_API_KEY="your-key"
 ```
 
-\* An OpenAI key is always required for the GPT-4o validator.
+\* An OpenAI key is always required for the GPT-4o Verifier.
 
 ## Usage
 
@@ -140,17 +140,17 @@ This executes:
 1. Attacker (`agents/attacker_agent.py`):
    - Uses prompts from `config/prompts/attacker_agent_prompts.yaml`
    - Executes adaptive multi-turn attack strategies
-   - **Prompt Optimizer:** Uses TextGrad to optimize its queries based on validator feedback (see `TGAttackerAgent` class)
+   - **Prompt Optimizer:** Uses TextGrad to optimize its queries based on verifier feedback (see `TGAttackerAgent` class)
    - **Planner:** Can extend attack plans with additional phases on-the-fly
 
 2. Target Model (`agents/target_model.py`):
    - Responds to attacker messages
    - Uses configuration from `config/config.yaml`
 
-3. Validator (`agents/gpt_evaluator.py`):
+3. Verifier (`agents/gpt_evaluator.py`):
     - Scores responses on a scale from 1-5 (benign to full jailbreak) and provides a reason
     - Uses GPT-4o
-    - Truncates target responses under validation to 512 tokens by default
+    - Truncates target responses under verification to 512 tokens by default
 
 4. Results:
    - Saves conversation logs and results in `attacks/[timestamp]/`
