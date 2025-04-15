@@ -4,8 +4,8 @@ by *Salman Rahman\*, Liwei Jiang\*, James Shiffer\*, Genglin Liu, Sheriff Issaka
 <small>*\*equal contribution*</small>
 
 <div align="center">
-    <a href="https://arxiv.org/abs/2410.10700"> <img alt="paper link" src="https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg"></a>
-    <a href="https://huggingface.co/datasets/TODO"> <img alt="dataset link" src="https://img.shields.io/badge/HuggingFace-XGuard--Train-yellow.svg"></a>
+    <a href="https://arxiv.org/abs/1234.56789"> <img alt="paper link" src="https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg"></a>
+    <a href="https://huggingface.co/datasets/marslabucla/XGuard-Train"> <img alt="dataset link" src="https://img.shields.io/badge/HuggingFace-XGuard--Train-yellow.svg"></a>
     <a href="https://x-teaming.github.io"> <img alt="dataset link" src="https://img.shields.io/badge/Website-X--Teaming-blue.svg"></a>
     <br>
     <br>
