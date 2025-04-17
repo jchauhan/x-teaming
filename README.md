@@ -4,7 +4,7 @@ by *Salman Rahman\*, Liwei Jiang\*, James Shiffer\*, Genglin Liu, Sheriff Issaka
 <small>*\*equal contribution*</small>
 
 <div align="center">
-    <a href="https://arxiv.org/abs/1234.56789"> <img alt="paper link" src="https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg"></a>
+    <a href="https://salmanrahman.net/assets/pdf/multiagent_jailbreaking.pdf"> <img alt="paper link" src="https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg"></a>
     <a href="https://huggingface.co/datasets/marslabucla/XGuard-Train"> <img alt="dataset link" src="https://img.shields.io/badge/HuggingFace-XGuard--Train-yellow.svg"></a>
     <a href="https://x-teaming.github.io"> <img alt="dataset link" src="https://img.shields.io/badge/Website-X--Teaming-blue.svg"></a>
     <br>
@@ -14,7 +14,7 @@ by *Salman Rahman\*, Liwei Jiang\*, James Shiffer\*, Genglin Liu, Sheriff Issaka
 
 <br>
 
-**𝕏-Teaming** is a scalable framework that systematically explores how seemingly harmless interactions with LLMs escalate into harmful outcomes. It employs collaborative agents for planning, attack optimization, and verification, achieving state-of-the-art multi-turn jailbreak effectiveness and diversity with **success rates up to 99.4%** across representative leading open-weight and closed-source models. In particular, **𝕏-Teaming** achieves a **96.2% attack success rate** against the latest Claude 3.7 Sonnet model, which has been considered nearly immune to single-turn attacks.
+**𝕏-Teaming** is a scalable framework that systematically explores how seemingly harmless interactions with LLMs escalate into harmful outcomes. It employs collaborative agents for planning, attack optimization, and verification, achieving state-of-the-art multi-turn jailbreak effectiveness and diversity with **success rates up to 98.1%** across representative leading open-weight and closed-source models. In particular, **𝕏-Teaming** achieves a **96.2% attack success rate** against the latest Claude 3.7 Sonnet model, which has been considered nearly immune to single-turn attacks.
 
 ## Quickstart
 
