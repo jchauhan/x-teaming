@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "x-teaming"
+version = "0.1.0"
+description = "Minimal Poetry setup from Conda environment"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "x_teaming" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# Main libraries
+aiohttp = "^3.11.15"
+datasets = "^3.4.1"
+gdown = "^5.2.0"
+google-cloud-aiplatform = "^1.85.0"
+huggingface_hub = "^0.30.1"
+matplotlib = "^3.10.1"
+numpy = "^2.2.4"
+openai = "^1.70.0"
+pandas = "^2.2.3"
+#pyside6 = "^6.7.2"
+scikit-learn = "^1.6.1"
+scipy = "^1.15.2"
+seaborn = "^0.13.2"
+sentence-transformers = "^3.4.1"
+statsmodels = "^0.14.4"
+textgrad = "^0.1.4"
+torch = "^2.6.0"
+transformers = "^4.50.0"
+
+# Optional utilities
+python-dotenv = "^1.1.0"
+tqdm = "^4.67.1"
+fsspec = "^2024.12.0"
+
+[tool.poetry.group.dev.dependencies]
+# Dev tools
+black = "^25.1.0"
+flake8 = "^7.2.0"
+isort = "^6.0.1"
+pre-commit = "^4.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
