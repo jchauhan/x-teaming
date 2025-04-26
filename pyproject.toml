@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Minimal Poetry setup from Conda environment"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-packages = [{ include = "x_teaming" }]
+packages = [
+    { include = "agents" },
+    { include = "analytics" },
+    { include = "xguard" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
